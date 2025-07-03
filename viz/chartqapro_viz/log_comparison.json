@@ -1,0 +1,54 @@
+{ 
+    "log_files": {
+      "Factoid": {
+        "Gemma3-4b-Direct": "/cb/home/aarti/ws/code/ws_repos/chartqapro/results/results_gemma4b_direct/google_gemma-3-4b-it/direct_test_results/Factoid",
+        "Gemma3-4b-CoT": "/cb/home/aarti/ws/code/ws_repos/chartqapro/results/results_gemma4b_cot/google_gemma-3-4b-it/cot_test_results/Factoid",
+        "Gemma3-4b+CePO-Direct": {
+          "reasoning": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+          "output": "paths to the folder which has logs for this subset (for this particular combination of model and run type)"
+        }
+      },
+      "Multi_Choice": {
+        "Gemma3-4b-Direct": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+        "Gemma3-4b-CoT": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+        "Gemma3-4b+CePO-Direct": {
+          "reasoning": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+          "output": "paths to the folder which has logs for this subset (for this particular combination of model and run type)"
+        }
+      },
+      "Conversational": {
+        "Gemma3-4b-Direct": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+        "Gemma3-4b-CoT": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+        "Gemma3-4b+CePO-Direct": {
+          "reasoning": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+          "output": "paths to the folder which has logs for this subset (for this particular combination of model and run type)"
+        }
+      },
+      "Fact_Checking": {
+        "Gemma3-4b-Direct": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+        "Gemma3-4b-CoT": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+        "Gemma3-4b+CePO-Direct": {
+          "reasoning": "paths to the folder which has logs for this subset (for this particular combination of model and run type)",
+          "output": "paths to the folder which has logs for this subset (for this particular combination of model and run type)"
+        }
+      },
+      "Hypothetical": {
+        "Gemma3-4b-Direct": "/cb/home/aarti/ws/code/ws_repos/chartqapro/results/results_gemma4b_direct/google_gemma-3-4b-it/direct_test_results/Hypothetical",
+        "Gemma3-4b-CoT": "/cb/home/aarti/ws/code/ws_repos/chartqapro/results/results_gemma4b_cot/google_gemma-3-4b-it/cot_test_results/Hypothetical",
+        "Gemma3-4b+CePO-Direct": "/cb/home/aarti/ws/code/ws_repos/chartqapro/results/results_gemma4b_direct_cepo/google_gemma-3-4b-it/direct_test_results/Hypothetical"
+      }
+    },
+    "run_description": {
+      "Gemma3-4b-Direct": "Baseline Gemma3 run with ChartQAPro using direct prompting",
+      "Gemma3-4b-CoT": "Baseline Gemma3 run with ChartQAPro using Chain of Thought prompting",
+      "Gemma3-4b+CePO-Direct":"Gemma3+CePO run with ChartQAPro using direct prompting"
+    },
+    "subset": {
+      "Factoid": "Factoid",
+      "Multi_Choice": "Multi Choice",
+      "Conversational": "Conversational",
+      "Fact_Checking": "Fact Checking",
+      "Hypothetical": "Hypothetical"
+    }
+  }
+  
