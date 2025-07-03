@@ -15,6 +15,8 @@ from evaluate_predictions import relaxed_correctness_chartqapro, fix_list_format
 from collections import defaultdict
 import shutil
 
+# NOTE: For --use_cepo, works only with changes to dump cb_log from `aarti/utkku_multimodal2` branch of cb_optillm
+#  https://github.com/CerebrasResearch/cb_optillm_internal/tree/aarti/utkku_multimodal2
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
