@@ -15,8 +15,6 @@ from evaluate_predictions import relaxed_correctness_chartqapro, fix_list_format
 from collections import defaultdict
 import shutil
 
-# NOTE: For --use_cepo, works only with changes to dump cb_log from `aarti/utkku_multimodal2` branch of cb_optillm
-#  https://github.com/CerebrasResearch/cb_optillm_internal/tree/aarti/utkku_multimodal2
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -518,13 +516,11 @@ def generate_responses(args):
     if not os.path.exists(results_dir):
         os.makedirs(results_dir)
 
-    cepo_dir = None
     if args.use_cepo:
         logging.info("Using CEPo for response generation")
         cepo_dir = os.path.join(results_dir, "cepo")
         if not os.path.exists(cepo_dir):
             os.makedirs(cepo_dir)
-
     
     # # Add filter info to filename
     # filter_suffix = ""
