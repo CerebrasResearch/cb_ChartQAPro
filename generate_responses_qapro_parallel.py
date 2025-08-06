@@ -2,7 +2,7 @@ from openai import OpenAI
 import argparse
 import base64
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageDraw
 import io
 import json
 from datasets import load_dataset
@@ -22,6 +22,7 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.INFO,
     datefmt='%Y-%m-%d %H:%M:%S')
+
 
 def get_prompt_template(strategy, category):
     """
@@ -146,7 +147,6 @@ def parse_arguments():
         "--model",
         type=str,
         default="google/gemma-3-4b-it",
-        choices=["Qwen/Qwen2-VL-2B", "microsoft/Phi-3.5-vision-instruct", "google/gemma-3-4b-it"],
         help="Model to use for evaluation"
     )
     parser.add_argument(
@@ -174,6 +174,12 @@ def parse_arguments():
         default="http://localhost:8055/v1",
         help="Base URL for the API server"
     )
+    parser.add_argument(
+        "--api_key",
+        type=str,
+        default="serving-on-vllm",
+        help="default key"
+    )
 
     parser.add_argument(
         "--skip_question_types",
@@ -194,16 +200,38 @@ def parse_arguments():
     parser.add_argument(
         "--use_cepo",
         action='store_true',
-        default=False
+        default=False,
+        help="If passed, save cepo logs"
     )  
     parser.add_argument(
-    "--num_workers",
-    type=int,
-    default=2,
-    help="Number of parallel workers (default: 2)"
+        "--num_workers",
+        type=int,
+        default=2,
+        help="Number of parallel workers (default: 2)"
     )   
+    parser.add_argument(
+        "--draw_grid_on_image",
+        action="store_true"
+    )
+    parser.add_argument(
+        "--grid_line_width",
+        required=False,
+        default=1,
+        type=int
+    )
+    parser.add_argument(
+        "--grid_size",
+        required=False,
+        default=50,  # draw 50x50 grids
+        type=int
+    )
+    parser.add_argument(
+        "--grid_line_color",
+        required=False,
+        default="gray",  # draw 30x30 grids
+        type=str
+    )
     
-
     return parser.parse_args()
 
 
@@ -227,7 +255,7 @@ def extract_final_answer(model_output):
     
     return model_output  # Fallback to original
 
-def encode_base64_content_pil_image(image) -> str:
+def encode_base64_content_pil_image(image, args) -> str:
     """Encode a content retrieved from a remote url to base64 format."""
 
     # Handle both PIL Image objects and bytes
@@ -242,8 +270,26 @@ def encode_base64_content_pil_image(image) -> str:
         temp_img = Image.open(io.BytesIO(image))
         img_width, img_height = temp_img.size
         print(f"Image resolution: {img_width}x{img_height} pixels")
-
+    
     image_pil = image_pil.convert("RGB")
+    
+    if args.draw_grid_on_image:
+        grid_size = args.grid_size
+        grid_line_width = args.grid_line_width
+        
+        draw = ImageDraw.Draw(image_pil)
+    
+        # Get image dimensions
+        img_width, img_height = image_pil.size
+        
+        # Draw vertical lines
+        for x in range(0, img_width, grid_size):
+            draw.line([(x, 0), (x, img_height)], fill=args.grid_line_color, width=grid_line_width)
+        
+        # Draw horizontal lines
+        for y in range(0, img_height, grid_size):
+            draw.line([(0, y), (img_width, y)], fill=args.grid_line_color, width=grid_line_width)
+        
     buffered = BytesIO()
     image_pil.save(buffered, format="JPEG")
     img_bytes = buffered.getvalue()
@@ -257,9 +303,9 @@ def load_huggingface_dataset(dataset_name, split, cache_dir=None):
     ds = load_dataset(dataset_name, cache_dir=cache_dir)
     return ds[split]
 
-def create_client(api_base):
+def create_client(api_base, openai_api_key):
     """Create OpenAI client for VLLM server."""
-    openai_api_key = "serving-on-vllm"  # Placeholder key for VLLM
+    # Placeholder key for VLLM
     
     client = OpenAI(
         api_key=openai_api_key,
@@ -349,7 +395,7 @@ def process_sample(idx, sample, args, client, total_samples, cepo_dir=None):
     
     # Process the image and generate response
     try:
-        img_b64 = encode_base64_content_pil_image(image)
+        img_b64 = encode_base64_content_pil_image(image, args)
         
         messages = [
             {
@@ -368,8 +414,6 @@ def process_sample(idx, sample, args, client, total_samples, cepo_dir=None):
             response = client.chat.completions.create(
                 model=args.model,
                 messages=messages,
-                temperature=0.1,
-                max_tokens=512,
                 extra_body={"log_file": cepo_log_file}
             )
         else:
@@ -377,8 +421,6 @@ def process_sample(idx, sample, args, client, total_samples, cepo_dir=None):
             response = client.chat.completions.create(
                 model=args.model,
                 messages=messages,
-                temperature=0.1,
-                max_tokens=512
             )
 
         
@@ -536,7 +578,7 @@ def generate_responses(args):
     # output_file = os.path.join(results_dir, f"{args.strategy}_{args.split}{filter_suffix}.json")
     
     # Create client
-    client = create_client(args.api_base)
+    client = create_client(args.api_base, args.api_key)
     
     total_samples = len(ds)
     logging.info(f"Processing {total_samples} samples with model {args.model} using {args.strategy} strategy")
